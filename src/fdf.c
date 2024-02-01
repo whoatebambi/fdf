@@ -13,134 +13,50 @@
 #include "../inc/fdf.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include "../minilibx_macos/mlx.h"
 
-#define W_WIDTH 1400
-#define W_HEIGHT 800
+#define W_WIDTH 600
+#define W_HEIGHT 300
+// #define MLX_ERROR 1
 #define RED 0xFF0000
 
-int	draw_line_bresenham(void *mlx, void *win, int beginX, int beginY, int endX, int endY, int color)
-{
-	double	deltaX;
-	double	deltaY;
-	int		pixels;
-	double pixelX = beginX;
-	double pixelY = beginY;
+typedef struct	s_data {
+	void	*img;
+	char	*addr;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+}				t_data;
 
-	deltaX = endX - beginX;
-	deltaY = endY - beginY;
-	pixels = sqrt((deltaX * deltaX) + (deltaY * deltaY));
-	deltaX /= pixels;
-	deltaY /= pixels;
-	while (pixels)
-	{
-		mlx_pixel_put(mlx, win, pixelX, pixelY, color);
-		pixelX += deltaX;
-		pixelY += deltaY;
-		--pixels;
-	}
+void	my_mlx_pixel_put(t_data *img_ptr, int x, int y, int color)
+{
+	char	*dst;
+
+	dst = img_ptr->addr + (y * img_ptr->line_length + x * (img_ptr->bits_per_pixel / 8));
+	*(unsigned int*)dst = color;
+}
+
+int	key_hook(int keycode, t_data img_ptr)
+{
+	printf("Hello from key_hook!\n");
 	return (0);
 }
 
-void swap(int* a , int*b) 
-{ 
-    int temp = *a; 
-    *a = *b; 
-    *b = temp; 
-} 
-
-float absolute(float x ) 
-{ 
-    if (x < 0) return -x; 
-    else return x; 
-} 
-
-//returns integer part of a floating point number 
-int iPartOfNumber(float x) 
-{ 
-    return (int)x; 
-} 
-
-//returns fractional part of a number 
-float fPartOfNumber(float x) 
-{ 
-    if (x>0) return x - iPartOfNumber(x); 
-    else return x - (iPartOfNumber(x)+1); 
-} 
-  
-//returns 1 - fractional part of number 
-float rfPartOfNumber(float x) 
-{ 
-    return 1 - fPartOfNumber(x); 
-} 
-
-int add_alpha(int color , float transparency) 
-{ 
-	// Convert transparency to an integer alpha value (0 to 255)
-	int	alpha = (int)(transparency * 255);
-	// Shift the alpha value to the correct position (24 bits) and add the original color
-	int	argb_color = (alpha << 24) | color;
-    return (argb_color);
-}
-
-int	draw_line_xiaolin(void *mlx, void *win, int beginX, int beginY, int endX, int endY, int color)
-{
-	int	steep = absolute(endY - beginY) > absolute(endX - beginX);
-	printf("steep = %d\n beginX > endX ?\nbeginX = %d\n endX = %d\n", steep, beginX, endX);
-	// swap the co-ordinates if slope > 1 or we draw backwards 
-
-    if (steep)
-    {
-        swap(&beginX, &beginY); 
-        swap(&endX, &endY); 
-    } 
-    if (beginX > endX) 
-    { 
-        swap(&beginX, &endX); 
-        swap(&beginY, &endY); 
-    } 
-	float	deltaX = endX - beginX;
-	float	deltaY = endY - beginY;
-	float	gradient = deltaY/deltaX;
-	if (deltaX == 0.0) 
-        gradient = 1; 
-	double pixelX = beginX;
-	double pixelY = beginY;
-	int pixelX1 = beginX;
-    int pixelX2 = endX; 
-    float interY = beginY; 
-
-	int	x = pixelX1;
-	while (x <= pixelX2)
-	{
-		if (steep)
-		{
-		mlx_pixel_put(mlx, win, iPartOfNumber(interY), x, add_alpha(color, rfPartOfNumber(interY)));
-		mlx_pixel_put(mlx, win, iPartOfNumber(interY)-1, x, add_alpha(color, fPartOfNumber(interY)));
-		}
-		else
-		{
-			mlx_pixel_put(mlx, win, x, iPartOfNumber(interY), add_alpha(color, rfPartOfNumber(interY)));
-			mlx_pixel_put(mlx, win, x, iPartOfNumber(interY)-1, add_alpha(color, fPartOfNumber(interY)));
-		}
-		interY += gradient; 
-		x++;
-	}
-	return(0);
-}
-
-
 int main()
 {
-	void	*mlx;
-	void	*win;
+	void	*mlx_ptr;
+	void	*mlx_win;
+	t_data	img_ptr;
 
-	mlx = mlx_init();
-	win = mlx_new_window(mlx, W_WIDTH, W_HEIGHT, "Drawing a line");
+	mlx_ptr = mlx_init();
+	mlx_win = mlx_new_window(mlx_ptr, W_WIDTH, W_HEIGHT, "TEST");
 
-	draw_line_bresenham(mlx, win, W_WIDTH - 40, W_HEIGHT, -40, 0, RED);
-	draw_line_xiaolin(mlx, win, W_WIDTH, W_HEIGHT, 0, 0, RED);
-	// mlx_pixel_put(mlx, win, W_WIDTH/2, W_HEIGHT/2, RED);
-	mlx_loop(mlx);
+	mlx_key_hook(mlx_win, key_hook, &img_ptr);
+
+	img_ptr.img = mlx_new_image(mlx_ptr, W_WIDTH, W_HEIGHT);
+	img_ptr.addr = mlx_get_data_addr(img_ptr.img, &img_ptr.bits_per_pixel, &img_ptr.line_length, &img_ptr.endian);
+	my_mlx_pixel_put(&img_ptr, W_WIDTH/2, W_HEIGHT/2, RED);
+	mlx_put_image_to_window(mlx_ptr, mlx_win, img_ptr.img, 0, 0);
+	mlx_loop(mlx_ptr);
+	
 }
