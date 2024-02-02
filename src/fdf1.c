@@ -57,22 +57,22 @@ float absolute(float x )
 } 
 
 //returns integer part of a floating point number 
-int iPartOfNumber(float x) 
+int nb_to_int(float x) 
 { 
     return (int)x; 
 } 
 
 //returns fractional part of a number 
-float fPartOfNumber(float x) 
+float nb_to_frac(float x) 
 { 
-    if (x>0) return x - iPartOfNumber(x); 
-    else return x - (iPartOfNumber(x)+1); 
+    if (x>0) return x - nb_to_int(x); 
+    else return x - (nb_to_int(x)+1); 
 } 
   
 //returns 1 - fractional part of number 
-float rfPartOfNumber(float x) 
+float nb_to_r_frac(float x) 
 { 
-    return 1 - fPartOfNumber(x); 
+    return 1 - nb_to_frac(x); 
 } 
 
 int add_alpha(int color , float transparency) 
@@ -87,9 +87,7 @@ int add_alpha(int color , float transparency)
 int	draw_line_xiaolin(void *mlx, void *win, int beginX, int beginY, int endX, int endY, int color)
 {
 	int	steep = absolute(endY - beginY) > absolute(endX - beginX);
-	printf("steep = %d\n beginX > endX ?\nbeginX = %d\n endX = %d\n", steep, beginX, endX);
 	// swap the co-ordinates if slope > 1 or we draw backwards 
-
     if (steep)
     {
         swap(&beginX, &beginY); 
@@ -104,32 +102,27 @@ int	draw_line_xiaolin(void *mlx, void *win, int beginX, int beginY, int endX, in
 	float	deltaY = endY - beginY;
 	float	gradient = deltaY/deltaX;
 	if (deltaX == 0.0) 
-        gradient = 1; 
-	double pixelX = beginX;
-	double pixelY = beginY;
-	int pixelX1 = beginX;
-    int pixelX2 = endX; 
-    float interY = beginY; 
+        gradient = 1;
 
-	int	x = pixelX1;
-	while (x <= pixelX2)
+    float interY = beginY; 
+	int	x = beginX;
+	while (x <= endX)
 	{
 		if (steep)
 		{
-		mlx_pixel_put(mlx, win, iPartOfNumber(interY), x, add_alpha(color, rfPartOfNumber(interY)));
-		mlx_pixel_put(mlx, win, iPartOfNumber(interY)-1, x, add_alpha(color, fPartOfNumber(interY)));
+			mlx_pixel_put(mlx, win, nb_to_int(interY), x, add_alpha(color, nb_to_r_frac(interY)));
+			mlx_pixel_put(mlx, win, nb_to_int(interY)-1, x, add_alpha(color, nb_to_frac(interY)));
 		}
 		else
 		{
-			mlx_pixel_put(mlx, win, x, iPartOfNumber(interY), add_alpha(color, rfPartOfNumber(interY)));
-			mlx_pixel_put(mlx, win, x, iPartOfNumber(interY)-1, add_alpha(color, fPartOfNumber(interY)));
+			mlx_pixel_put(mlx, win, x, nb_to_int(interY), add_alpha(color, nb_to_r_frac(interY)));
+			mlx_pixel_put(mlx, win, x, nb_to_int(interY)-1, add_alpha(color, nb_to_frac(interY)));
 		}
 		interY += gradient; 
 		x++;
 	}
 	return(0);
 }
-
 
 int main()
 {
