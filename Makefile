@@ -10,92 +10,96 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = tutorial
+NAME = fdf
 
-SOURCES = src/fdf.c
+CC = gcc #cc
+FLAGS = -Wall -Werror -Wextra -O3 #-03
+LIBRARIES = -lmlx -lm -lft -L$(LIBFT_DIRECTORY) -L$(MINILIBX_DIRECTORY) -framework OpenGL -framework AppKit
+INCLUDES = -I$(HEADERS_DIRECTORY) -I$(LIBFT_HEADERS) -I$(MINILIBX_HEADERS)
 
-OBJECTS = $(subst .c,.o,$(SOURCES))
+LIBFT = $(LIBFT_DIRECTORY)libft.a
+LIBFT_DIRECTORY = ./libft/
+LIBFT_HEADERS = $(LIBFT_DIRECTORY)inc/
 
-FLAGS = -Wall -Wextra #-Werror
-LINKS = -I libft -L libft \
-    -I /usr/local/include -L /usr/local/lib \
-    -l mlx -l ft -framework OpenGL -framework Appkit
+MINILIBX = $(MINILIBX_DIRECTORY)libmlx.a
+MINILIBX_DIRECTORY = ./minilibx_macos/
+MINILIBX_HEADERS = $(MINILIBX_DIRECTORY)
 
-# Remember to implement your rules...
+HEADERS_LIST = fdf.h\
+	key_macos.h\
+	# color.h\
+	# error_message.h
+HEADERS_DIRECTORY = ./inc/
+HEADERS = $(addprefix $(HEADERS_DIRECTORY), $(HEADERS_LIST))
 
-$(NAME): $(OBJECTS)
-    gcc $(SOURCES) -o $(NAME) $(FLAGS) $(LINKS)
+SOURCES_DIRECTORY = ./src/
+SOURCES_LIST = main.c\
+	controls.c\
+	draw.c\
+	# read_map.c\
+	# read_stack.c\
+	# init.c\
+	# convert.c\
+	# color.c\
+	# project.c\
+	# menu.c\
+	# keyboard_controls.c\
+	# mouse_controls.c\
+	# controls_utils.c\
+	# utils.c\
+	# utils_2.c
+SOURCES = $(addprefix $(SOURCES_DIRECTORY), $(SOURCES_LIST))
 
+OBJECTS_DIRECTORY = obj/
+OBJECTS_LIST = $(patsubst %.c, %.o, $(SOURCES_LIST))
+OBJECTS	= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
 
+# COLORS
 
-# NAME				= client
-# SVR					= server
-# CLNBN				= client_bonus
-# SVRBN				= server_bonus
+GREEN = \033[0;32m
+RED = \033[0;31m
+RESET = \033[0m
 
-# # Directories
-# LIBFT				= ./libft/libft.a
-# INC					= inc/
-# SRC_DIR				= src/
-# OBJ_DIR				= obj/
+.PHONY: all clean fclean re
 
-# # Compiler and CFlags
-# CC					= cc
-# CFLAGS				= -Wall -Werror -Wextra -I
-# RM					= rm -f
+all: $(NAME)
 
-# # Create full paths for source and object files
-# SRCCL 				= $(addprefix $(SRC_DIR), $(addsuffix .c, $(NAME)))
-# SRCSV 				= $(addprefix $(SRC_DIR), $(addsuffix .c, $(SVR)))
-# SRCCLB 				= $(addprefix $(SRC_DIR), $(addsuffix .c, $(CLNBN)))
-# SRCSVB 				= $(addprefix $(SRC_DIR), $(addsuffix .c, $(SVRBN)))
+$(NAME): $(LIBFT) $(MINILIBX) $(OBJECTS_DIRECTORY) $(OBJECTS)
+	@$(CC) $(FLAGS) $(LIBRARIES) $(INCLUDES) $(OBJECTS) -o $(NAME)
+	@echo "\n$(NAME): $(GREEN)object files were created$(RESET)"
+	@echo "$(NAME): $(GREEN)$(NAME) was created$(RESET)"
 
-# OBJCL 				= $(addprefix $(OBJ_DIR), $(addsuffix .o, $(NAME)))
-# OBJSV 				= $(addprefix $(OBJ_DIR), $(addsuffix .o, $(SVR)))
-# OBJCLB				= $(addprefix $(OBJ_DIR), $(addsuffix .o, $(CLNBN)))
-# OBJSVB 				= $(addprefix $(OBJ_DIR), $(addsuffix .o, $(SVRBN)))
+$(OBJECTS_DIRECTORY):
+	@mkdir -p $(OBJECTS_DIRECTORY)
+	@echo "$(NAME): $(GREEN)$(OBJECTS_DIRECTORY) was created$(RESET)"
 
-# start:				
-# 					@make all
+$(OBJECTS_DIRECTORY)%.o : $(SOURCES_DIRECTORY)%.c $(HEADERS)
+	@$(CC) $(FLAGS) -c $(INCLUDES) $< -o $@
+	@echo "$(GREEN).$(RESET)\c"
 
-# $(LIBFT):
-# 					@make -C ./libft
+$(LIBFT):
+	@echo "$(NAME): $(GREEN)Creating $(LIBFT)...$(RESET)"
+	@$(MAKE) -sC $(LIBFT_DIRECTORY)
 
-# all:				$(NAME) $(SVR)		
+$(MINILIBX):
+	@echo "$(NAME): $(GREEN)Creating $(MINILIBX)...$(RESET)"
+	@$(MAKE) -sC $(MINILIBX_DIRECTORY)
 
-# $(NAME):			$(OBJCL) $(LIBFT)
-# 					@$(CC) $(CFLAGS) $(INC) $(OBJCL) $(LIBFT) -o $(NAME)
-# 					@echo "\033[0;92m* client file was created *\033[0m"
+clean:
+	@$(MAKE) -sC $(LIBFT_DIRECTORY) clean
+	@$(MAKE) -sC $(MINILIBX_DIRECTORY) clean
+	@rm -rf $(OBJECTS_DIRECTORY)
+	@echo "$(NAME): $(RED)$(OBJECTS_DIRECTORY) was deleted$(RESET)"
+	@echo "$(NAME): $(RED)object files were deleted$(RESET)"
 
-# $(SVR):				$(OBJSV) $(LIBFT)
-# 					@$(CC) $(CFLAGS) $(INC) $(OBJSV) $(LIBFT) -o $(SVR)
-# 					@echo "\033[0;92m* server file was created *\033[0m"
-					
-# bonus:				all $(CLNBN) $(SVRBN)
+fclean: clean
+	@rm -f $(MINILIBX)
+	@echo "$(NAME): $(RED)$(MINILIBX) was deleted$(RESET)"
+	@rm -f $(LIBFT)
+	@echo "$(NAME): $(RED)$(LIBFT) was deleted$(RESET)"
+	@rm -f $(NAME)
+	@echo "$(NAME): $(RED)$(NAME) was deleted$(RESET)"
 
-# $(CLNBN):			$(OBJCLB) $(LIBFT)
-# 					@$(CC) $(CFLAGS) $(INC) $(OBJCLB) $(LIBFT) -o $(CLNBN)
-# 					@echo "\033[0;92m* client_bonus file was created *\033[0m"
-
-# $(SVRBN):			$(OBJSVB) $(LIBFT)
-# 					@$(CC) $(CFLAGS) $(INC) $(OBJSVB) $(LIBFT) -o $(SVRBN)
-# 					@echo "\033[0;92m* server_bonus file was created *\033[0m"
-
-
-# $(OBJ_DIR)%.o:		$(SRC_DIR)%.c 
-# 					@mkdir -p $(@D)
-# 					@$(CC) $(CFLAGS) $(INC) -c $< -o $@
-
-# clean:
-# 					@$(RM) -r $(OBJ_DIR)
-# 					@make clean -C ./libft
-# 					@echo "\033[0;91m* object files were deleted *\033[0m"
-
-# fclean:				clean
-# 					@$(RM) $(NAME) $(SVR) $(CLNBN) $(SVRBN)
-# 					@$(RM) $(LIBFT)
-# 					@echo "\033[0;91m* all files were deleted *\033[0m"
-
-# re:					fclean all
-
-# .PHONY:				start all clean fclean re bonus
+re:
+	@$(MAKE) fclean
+	@$(MAKE) all
