@@ -19,21 +19,12 @@
 #include <stdio.h>
 #include <math.h>
 #include "../minilibx_macos/mlx.h"
-#include <errno.h>
 
 #define WIDTH 1400
 #define HEIGHT 800
 #define RED 0xFF0000
 #define GREEN 0xFF00
 #define WHITE 0xFFFFFF
-
-# define ERR_USAGE			"Usage: ./fdf MAP_FILE"
-# define ERR_MAP			"Incorrect MAP_FILE"
-# define ERR_MAP_READING	"Reading error"
-# define ERR_MAP_INIT		"Map initialization error"
-# define ERR_FDF_INIT		"FdF initialization error"
-# define ERR_CONV_TO_ARR	"Conversion to array"
-# define ERR_CAMERA_INIT	"Camera initialization error"
 
 typedef struct s_fdf
 {

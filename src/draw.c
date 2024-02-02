@@ -62,6 +62,46 @@ int	draw_line_bresenham(t_fdf *fdf, int beginX, int beginY, int endX, int endY, 
 	return (0);
 }
 
+int	draw_line_xiaolin(t_fdf *fdf, int beginX, int beginY, int endX, int endY, int color)
+{
+	int	steep = absolute(endY - beginY) > absolute(endX - beginX);
+	// swap the co-ordinates if slope > 1 or we draw backwards 
+    if (steep)
+    {
+        swap(&beginX, &beginY); 
+        swap(&endX, &endY); 
+    } 
+    if (beginX > endX) 
+    { 
+        swap(&beginX, &endX); 
+        swap(&beginY, &endY); 
+    } 
+	float	deltaX = endX - beginX;
+	float	deltaY = endY - beginY;
+	float	gradient = deltaY/deltaX;
+	if (deltaX == 0.0) 
+        gradient = 1;
+
+    float interY = beginY; 
+	int	x = beginX;
+	while (x <= endX)
+	{
+		if (steep)
+		{
+			img_pix_put(fdf, nb_to_int(interY), x, add_alpha(color, nb_to_r_frac(interY)));
+			img_pix_put(fdf, nb_to_int(interY)-1, x, add_alpha(color, nb_to_frac(interY)));
+		}
+		else
+		{
+			img_pix_put(fdf, x, nb_to_int(interY), add_alpha(color, nb_to_r_frac(interY)));
+			img_pix_put(fdf, x, nb_to_int(interY)-1, add_alpha(color, nb_to_frac(interY)));
+		}
+		interY += gradient; 
+		x++;
+	}
+	return(0);
+}
+
 void	swap(int *a, int *b) 
 { 
     int	temp;
@@ -109,44 +149,4 @@ int	add_alpha(int color , float transparency)
 	// Shift the alpha value to the correct position (24 bits) and add the original color
 	argb_color = (alpha << 24) | color;
 	return (argb_color);
-}
-
-int	draw_line_xiaolin(t_fdf *fdf, int beginX, int beginY, int endX, int endY, int color)
-{
-	int	steep = absolute(endY - beginY) > absolute(endX - beginX);
-	// swap the co-ordinates if slope > 1 or we draw backwards 
-    if (steep)
-    {
-        swap(&beginX, &beginY); 
-        swap(&endX, &endY); 
-    } 
-    if (beginX > endX) 
-    { 
-        swap(&beginX, &endX); 
-        swap(&beginY, &endY); 
-    } 
-	float	deltaX = endX - beginX;
-	float	deltaY = endY - beginY;
-	float	gradient = deltaY/deltaX;
-	if (deltaX == 0.0) 
-        gradient = 1;
-
-    float interY = beginY; 
-	int	x = beginX;
-	while (x <= endX)
-	{
-		if (steep)
-		{
-			img_pix_put(fdf, nb_to_int(interY), x, add_alpha(color, nb_to_r_frac(interY)));
-			img_pix_put(fdf, nb_to_int(interY)-1, x, add_alpha(color, nb_to_frac(interY)));
-		}
-		else
-		{
-			img_pix_put(fdf, x, nb_to_int(interY), add_alpha(color, nb_to_r_frac(interY)));
-			img_pix_put(fdf, x, nb_to_int(interY)-1, add_alpha(color, nb_to_frac(interY)));
-		}
-		interY += gradient; 
-		x++;
-	}
-	return(0);
 }
