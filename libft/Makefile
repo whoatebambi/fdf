@@ -10,37 +10,39 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = libft.a
-CC = gcc
-FLAGS = -Wall -Werror -Wextra -O3 -c
-INCLUDES = -I$(HEADERS_DIRECTORY)
-HEADERS_LIST = libft.h\
-	# get_next_line.h
-HEADERS_DIRECTORY = ./inc/
-HEADERS = $(addprefix $(HEADERS_DIRECTORY), $(HEADERS_LIST))
-SOURCES_DIRECTORY = ./src/
-SOURCES_LIST =	ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_strlen.c \
-					ft_memset.c ft_bzero.c ft_memcpy.c ft_memmove.c ft_strlcpy.c ft_strlcat.c \
-					ft_toupper.c ft_tolower.c ft_strchr.c ft_strrchr.c ft_strncmp.c ft_memchr.c \
-					ft_memcmp.c ft_strnstr.c ft_calloc.c ft_strdup.c ft_atoi.c ft_substr.c \
-					ft_strjoin.c ft_strmapi.c ft_strtrim.c ft_itoa.c ft_striteri.c ft_putchar_fd.c \
-					ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_split.c \
-					ft_lstadd_back.c ft_lstadd_front.c ft_lstclear.c ft_lstdelone.c \
-					ft_lstiter.c ft_lstlast.c ft_lstmap.c ft_lstnew.c ft_lstsize.c \
-					ft_printf.c ft_putpercent.c ft_strchr.c ft_strlen.c ft_putchar.c ft_putstr.c \
-					ft_putnbr.c ft_putunsigned.c ft_puthexa.c ft_putptr.c ft_format.c \
+NAME	=	libft.a
+CC		=	gcc
+FLAGS	=	-Wall -Wextra -Werror
 
+INCLUDES			=	-I$(HEADERS_DIRECTORY)
+HEADERS_DIRECTORY	=	./inc/
+HEADERS_LIST		=	libft.h \
+						ft_printf.h \
+						get_next_line.h \
+HEADERS				=	$(addprefix $(HEADERS_DIRECTORY), $(HEADERS_LIST))
 
-SOURCES = $(addprefix $(SOURCES_DIRECTORY), $(SOURCES_LIST))
-OBJECTS_DIRECTORY = obj/
-OBJECTS_LIST = $(patsubst %.c, %.o, $(SOURCES_LIST))
-OBJECTS	= $(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
+SOURCES_DIRECTORY	=	./src/
+SOURCES_LIST		=	ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_strlen.c \
+						ft_memset.c ft_bzero.c ft_memcpy.c ft_memmove.c ft_strlcpy.c ft_strlcat.c \
+						ft_toupper.c ft_tolower.c ft_strchr.c ft_strrchr.c ft_strncmp.c ft_memchr.c \
+						ft_memcmp.c ft_strnstr.c ft_calloc.c ft_strdup.c ft_atoi.c ft_substr.c \
+						ft_strjoin.c ft_strmapi.c ft_strtrim.c ft_itoa.c ft_striteri.c ft_putchar_fd.c \
+						ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_split.c \
+						ft_lstadd_back.c ft_lstadd_front.c ft_lstclear.c ft_lstdelone.c \
+						ft_lstiter.c ft_lstlast.c ft_lstmap.c ft_lstnew.c ft_lstsize.c \
+						ft_printf.c ft_putpercent.c ft_strchr.c ft_putchar.c ft_putstr.c \
+						ft_putnbr.c ft_putunsigned.c ft_puthexa.c ft_putptr.c ft_format.c \
+						get_next_line.c get_next_line_utils.c \
 
-# COLORS
+SOURCES				=	$(addprefix $(SOURCES_DIRECTORY), $(SOURCES_LIST))
 
-GREEN = \033[0;32m
-RED = \033[0;31m
-RESET = \033[0m
+OBJECTS_DIRECTORY	=	./obj/
+OBJECTS_LIST		=	$(patsubst %.c, %.o, $(SOURCES_LIST))
+OBJECTS				=	$(addprefix $(OBJECTS_DIRECTORY), $(OBJECTS_LIST))
+
+GREEN	=	\033[0;32m
+RED		=	\033[0;31m
+RESET	=	\033[0m
 
 .PHONY: all clean fclean re
 
@@ -66,9 +68,10 @@ clean:
 	@echo "$(NAME): $(RED)object files were deleted$(RESET)"
 
 fclean: clean
-	@rm -f $(NAME)
+	@rm -rf $(NAME)
 	@echo "$(NAME): $(RED)$(NAME) was deleted$(RESET)"
 
+# re :	fclean $(NAME)
 re:
 	@$(MAKE) fclean
 	@$(MAKE) all

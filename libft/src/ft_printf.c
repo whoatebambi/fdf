@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ft_printf.h"
 
 int	ft_printf(const char *str, ...)
 {
@@ -25,7 +25,7 @@ int	ft_printf(const char *str, ...)
 		return (-1);
 	while (str[i])
 	{
-		if (str[i] == '%' && (ft_strchr("cspdiuxX%", str[i + 1]) == NULL))
+		if (str[i] == '%' && (ft_strchr("cspdiuxX%", str[i + 1]) == 0))
 			return (-1);
 		if (str[i] == '%')
 		{

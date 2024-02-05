@@ -13,18 +13,40 @@
 #ifndef FDF_H
 # define FDF_H
 
-#include "../libft/inc/libft.h"
+// #include "../libft/inc/libft.h"
+// #include "libft.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include "../minilibx_macos/mlx.h"
+// #include "mlx.h"
+#include <fcntl.h>
+#include <limits.h>
 
 #define WIDTH 1400
 #define HEIGHT 800
 #define RED 0xFF0000
 #define GREEN 0xFF00
 #define WHITE 0xFFFFFF
+
+typedef struct			s_coord_val
+{
+	int					z;
+	int					color;
+	struct s_coord_val	*next;
+}						t_coord_val;
+
+typedef struct			s_map
+{
+	int					width;
+	int					height;
+	int					*coords_arr;
+	int					*colors_arr;
+	int					z_min;
+	int					z_max;
+	int					z_range;
+}						t_map;
 
 typedef struct s_fdf
 {
@@ -35,7 +57,20 @@ typedef struct s_fdf
     int		bpp;
     int		line_len;
     int		endian;
+    t_map	*map;
 }	t_fdf;
+
+
+
+
+void	*ft_memalloc(size_t size);
+void	ft_error(char *msg);
+t_fdf	*fdf_init(t_map *map);
+t_map	*map_init(void);
+void	read_map(int fd, t_coord_val **coords_stack, t_map *map);
+void	parse_line(char	**coords_line, t_coord_val **coords_stack, t_map *map);
+static 	t_coord_val	*new_coord(char *coords_line);
+void	push(t_coord_val **coords_stack, t_coord_val *new);
 
 
 int		ft_close(void *param);
