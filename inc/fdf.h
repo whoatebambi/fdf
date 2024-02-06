@@ -30,12 +30,40 @@
 #define GREEN 0xFF00
 #define WHITE 0xFFFFFF
 
+typedef enum
+{
+	ISO,
+	PARALLEL
+}	t_projection;
+
+# define FT_ABS(X) (((X) < 0) ? (-(X)) : (X))
+
 typedef struct			s_coord_val
 {
 	int					z;
 	int					color;
 	struct s_coord_val	*next;
 }						t_coord_val;
+
+typedef struct			s_point
+{
+	int					x;
+	int					y;
+	int					z;
+	int					color;
+}						t_point;
+
+typedef struct			s_camera
+{
+	t_projection		projection;
+	int					zoom;
+	double				alpha;
+	double				beta;
+	double				gamma;
+	float				z_divisor;
+	int					x_offset;
+	int					y_offset;
+}						t_camera;
 
 typedef struct			s_map
 {
@@ -48,18 +76,19 @@ typedef struct			s_map
 	int					z_range;
 }						t_map;
 
-typedef struct s_fdf
+typedef struct			s_fdf
 {
-    void	*mlx;
-    void	*win;
-	void	*img;
-    char	*addr;
-    int		bpp;
-    int		line_len;
-    int		endian;
-    t_map	*map;
-}	t_fdf;
-
+	void				*mlx;
+	void				*win;
+	void				*img;
+	char				*addr;
+	int					bpp;
+	int					line_len;
+	int					endian;
+	t_camera			*camera;
+	t_map				*map;
+	// t_mouse				*mouse;
+}						t_fdf;
 
 
 
@@ -72,12 +101,17 @@ void	parse_line(char	**coords_line, t_coord_val **coords_stack, t_map *map);
 static 	t_coord_val	*new_coord(char *coords_line);
 void	push(t_coord_val **coords_stack, t_coord_val *new);
 
+t_coord_val	*pop(t_coord_val **coords_stack);
+static void	draw_line(t_point f, t_point s, t_fdf *fdf);
+t_point		project(t_point p, t_fdf *fdf);
+t_point	new_point(int x, int y, t_map *map);
+
 
 int		ft_close(void *param);
 int		key_press(int key);
 void	setup_controls(t_fdf *fdf);
 
-void	draw(t_fdf *fdf);
+void	draw(t_map *map, t_fdf *fdf);
 int		draw_line_bresenham(t_fdf *fdf, int beginX, int beginY, int endX, int endY, int color);
 void	swap(int* a, int*b);
 float	absolute(float x);

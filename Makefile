@@ -12,8 +12,8 @@
 
 NAME = fdf
 
-CC = gcc #cc
-FLAGS = -Wall -Werror -Wextra #-03
+CC = gcc#cc
+FLAGS = #-Wall -Werror -Wextra #-03
 LIBRARIES = -lmlx -lm -lft -L$(LIBFT_DIRECTORY) -L$(MINILIBX_DIRECTORY) -framework OpenGL -framework AppKit
 INCLUDES = -I$(HEADERS_DIRECTORY) -I$(LIBFT_HEADERS) -I$(MINILIBX_HEADERS)
 
