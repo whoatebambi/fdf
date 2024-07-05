@@ -1,19 +1,19 @@
-# **************************************************************************** #
+#******************************************************************************#
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: fcouserg <fcouserg@student.42.fr>          +#+  +:+       +#+         #
+#    By: vbrazhni <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/11/14 18:59:07 by fcouserg          #+#    #+#              #
-#    Updated: 2023/11/21 14:52:36 by fcouserg         ###   ########.fr        #
+#    Created: 2018/07/05 13:39:23 by vbrazhni          #+#    #+#              #
+#    Updated: 2018/07/05 13:39:24 by vbrazhni         ###   ########.fr        #
 #                                                                              #
-# **************************************************************************** #
+#******************************************************************************#
 
 NAME = fdf
 
-CC = gcc#cc
-FLAGS = #-Wall -Werror -Wextra #-03
+CC = cc
+FLAGS = #-Wall -Werror -Wextra -O3 -c
 LIBRARIES = -lmlx -lm -lft -L$(LIBFT_DIRECTORY) -L$(MINILIBX_DIRECTORY) -framework OpenGL -framework AppKit
 INCLUDES = -I$(HEADERS_DIRECTORY) -I$(LIBFT_HEADERS) -I$(MINILIBX_HEADERS)
 
@@ -25,30 +25,14 @@ MINILIBX = $(MINILIBX_DIRECTORY)libmlx.a
 MINILIBX_DIRECTORY = ./minilibx_macos/
 MINILIBX_HEADERS = $(MINILIBX_DIRECTORY)
 
-HEADERS_LIST =	fdf.h\
-				key_macos.h\
-	# color.h\
-	# error_message.h
+HEADERS_LIST = fdf.h\
+
 HEADERS_DIRECTORY = ./inc/
 HEADERS = $(addprefix $(HEADERS_DIRECTORY), $(HEADERS_LIST))
 
 SOURCES_DIRECTORY = ./src/
-SOURCES_LIST =	main.c\
-				controls.c\
-				draw.c\
-				parsing.c \
-	# read_map.c\
-	# read_stack.c\
-	# init.c\
-	# convert.c\
-	# color.c\
-	# project.c\
-	# menu.c\
-	# keyboard_controls.c\
-	# mouse_controls.c\
-	# controls_utils.c\
-	# utils.c\
-	# utils_2.c
+SOURCES_LIST = main.c init.c render.c parsing.c parsing_utils.c utils.c \
+
 SOURCES = $(addprefix $(SOURCES_DIRECTORY), $(SOURCES_LIST))
 
 OBJECTS_DIRECTORY = obj/

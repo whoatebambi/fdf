@@ -11,61 +11,120 @@
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include "ft_printf.h"
-#include "get_next_line.h"
-#include "libft.h"
 
-
-static t_coord_val	*new_coord(char *coords_line)
+void	get_coord(char **map_array, t_map *map)
 {
-	t_coord_val	*coord;
-	char		**parts;
+	char **line;
+	int x;
+	int y;
+	int width;
 
-	coord = (t_coord_val *)ft_memalloc(sizeof(t_coord_val));
-	// if NULL
-	parts = ft_split(coords_line, ',');
-	// ft_isnumber(parts[0], 10);
-	// parts[1] && !ft_isnumber(parts[1], 16);
-	coord->z = ft_atoi(parts[0]);
-	coord->color = 0;// parts[1] ? ft_atoi_base(parts[1], 16) : -1;
-	coord->next = NULL;
-	// free_strsplit_arr(parts);
-	return (coord);
-}
-void	push(t_coord_val **coords_stack, t_coord_val *new)
-{
-	if (coords_stack)
+	y = 0;
+    
+    map->array = NULL;
+	map->array = ft_calloc(map->height, sizeof(t_coordinate *)); // do i need the +1?
+	while (map_array[y])
 	{
-		if (new)
-			new->next = *coords_stack;
-		*coords_stack = new;
+        x = 0;
+		line = ft_split(map_array[y], ' ');
+		// error ft_split
+        map->array[y] = ft_calloc(map->width, sizeof(t_coordinate)); // do i need the +1?
+        // error ft_calloc
+        while (line[x])
+        {
+            map->array[y][x].x = x;
+            map->array[y][x].y = y;
+            map->array[y][x].z = ft_atoi(line[x]);
+            // printf("[%d] x: %d, y: %d, z: %d\n", y, array[y][x].x, array[y][x].y, array[y][x].z);
+            x++;
+        }
+		free(line);
+		y++;
 	}
 }
 
-t_coord_val	*pop(t_coord_val **coords_stack)
+char	*map_to_str(char *file_name)
 {
-	t_coord_val *top;
+	int fd;
+    char *line;
+    char *map;
 
-	top = NULL;
-	if (coords_stack && *coords_stack)
+    fd = open(file_name, O_RDONLY);
+    map = ft_calloc(1, sizeof(char));
+    if (map == NULL)
 	{
-		top = *coords_stack;
-		*coords_stack = (*coords_stack)->next;
+		printf("Error: ft_calloc\n");
+		close(fd);
+		exit (-1);
 	}
-	return (top);
+	line = get_next_line(fd);
+	if (line == NULL)
+	{
+		printf("Error: empty file\n");
+		close(fd);
+		free(map);
+		exit (-1);
+	}
+	while (line != NULL)
+	{
+		map = ft_strjoin(map, line);
+		free(line);
+		line = get_next_line(fd);
+	}
+    close(fd);
+    return (map);
 }
 
-void	parse_line(char	**coords_line, t_coord_val **coords_stack, t_map *map)
+void	get_height(char **map_array, t_map *map)
 {
-	int	width;
+	int i;
 
-	width = 0;
-	while (*coords_line)
+	i = 0;
+	while (map_array[i])
+		i++;
+	map->height = i;
+	printf("height: %d\n", map->height);
+}
+
+
+void	get_width(char **map_array, t_map *map)
+{
+	int i;
+	int j;
+	int width;
+
+	i = 0;
+	width = ft_word_count(map_array[i], ' ');
+	while (map_array[i])
 	{
-		push(coords_stack, new_coord(*(coords_line++)));
-		width++;
+		if (ft_word_count(map_array[i], ' ') != width)
+		{
+			printf("Error: incorrect format\n");
+			// free(map_array);
+			exit (-1);
+		}
+		i++;
 	}
-	if (map->height == 0)
-		map->width = width;
+	map->width = width;
+    printf("width: %d\n", map->width);
+}
 
+int     parse_map(char *file_name, t_data *data)
+{
+	char *map;
+	char **map_array;
+
+	map = map_to_str(file_name);
+	check_isdigit(map);
+	map_array = ft_split(map, '\n');
+	free(map);
+    data->map = malloc(sizeof(t_map));
+    // error malloc
+	get_height(map_array, data->map);
+	get_width(map_array, data->map);
+	// for (int i = 0; map_array[i]; i++)
+	// 	printf("%s\n", map_array[i]);
+	get_coord(map_array, data->map);
+    // error get_coord
+    return (0);
 }

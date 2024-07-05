@@ -3,125 +3,100 @@
 /*                                                        :::      ::::::::   */
 /*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fcouserg <fcouserg@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vbrazhni <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/02 14:33:43 by fcouserg          #+#    #+#             */
-/*   Updated: 2023/11/16 11:18:50 by fcouserg         ###   ########.fr       */
+/*   Created: 2018/08/02 10:39:59 by vbrazhni          #+#    #+#             */
+/*   Updated: 2018/08/02 10:40:00 by vbrazhni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
+
 # define FDF_H
 
-// #include "../libft/inc/libft.h"
-// #include "libft.h"
-
+#include "libft.h"
+#include <mlx.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-#include "../minilibx_macos/mlx.h"
-// #include "mlx.h"
-#include <fcntl.h>
-#include <limits.h>
+#include <string.h>
 
-#define WIDTH 1400
-#define HEIGHT 800
-#define RED 0xFF0000
-#define GREEN 0xFF00
-#define WHITE 0xFFFFFF
+// MACROS
+# define WINDOW_WIDTH 200
+# define WINDOW_HEIGHT 200
+# define GREEN 0xFF00
 
-typedef enum
+enum {
+	ON_KEYDOWN = 2,
+	ON_KEYUP = 3,
+	ON_MOUSEDOWN = 4,
+	ON_MOUSEUP = 5,
+	ON_MOUSEMOVE = 6,
+	ON_EXPOSE = 12,
+	ON_DESTROY = 17
+};
+
+typedef struct s_coordinate
 {
-	ISO,
-	PARALLEL
-}	t_projection;
+	int				x;
+	int				y;
+	int				z;
+}					t_coordinate;
 
-# define FT_ABS(X) (((X) < 0) ? (-(X)) : (X))
-
-typedef struct			s_coord_val
+typedef struct s_map
 {
-	int					z;
-	int					color;
-	struct s_coord_val	*next;
-}						t_coord_val;
+	int				width;
+	int				height;
+	t_coordinate	**array;
+}					t_map;
 
-typedef struct			s_point
+typedef struct s_image
 {
-	int					x;
-	int					y;
-	int					z;
-	int					color;
-}						t_point;
+    void	*img;
+	void	*addr;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+}         t_image;
 
-typedef struct			s_camera
+
+typedef struct s_data
 {
-	t_projection		projection;
-	int					zoom;
-	double				alpha;
-	double				beta;
-	double				gamma;
-	float				z_divisor;
-	int					x_offset;
-	int					y_offset;
-}						t_camera;
+    void    *mlx;
+    void    *mlx_win;
+    t_image image;
+	t_map	*map;
+    int     background_color;
+}            t_data;
 
-typedef struct			s_map
-{
-	int					width;
-	int					height;
-	int					*coords_arr;
-	int					*colors_arr;
-	int					z_min;
-	int					z_max;
-	int					z_range;
-}						t_map;
+// parsing.c
+int     parse_map(char *file_name, t_data *data);
+void	get_width(char **map_array, t_map *map);
+void	get_height(char **map_array, t_map *map);
+char	*map_to_str(char *file_name);
+void	get_coord(char **map_array, t_map *map);
 
-typedef struct			s_fdf
-{
-	void				*mlx;
-	void				*win;
-	void				*img;
-	char				*addr;
-	int					bpp;
-	int					line_len;
-	int					endian;
-	t_camera			*camera;
-	t_map				*map;
-	// t_mouse				*mouse;
-}						t_fdf;
+// parsing_utils.c
+void		check_args(int argc, char **argv);
+void		check_folder(char *file_name);
+void		check_file(char *filename);
+void	check_isdigit(char *map);
+
+// init.c
+int			init_window(t_data *data);
+int			init_image(t_data *data);
+void		init_hooks(t_data *data);
+
+// render.c
+int			render(t_data *data);
+void		set_background(t_data *data, int color);
+void		my_mlx_pixel_put(t_data *data, int x, int y, int color);
+void	draw(t_data *data);
 
 
-
-void	*ft_memalloc(size_t size);
-void	ft_error(char *msg);
-t_fdf	*fdf_init(t_map *map);
-t_map	*map_init(void);
-void	read_map(int fd, t_coord_val **coords_stack, t_map *map);
-void	parse_line(char	**coords_line, t_coord_val **coords_stack, t_map *map);
-static 	t_coord_val	*new_coord(char *coords_line);
-void	push(t_coord_val **coords_stack, t_coord_val *new);
-
-t_coord_val	*pop(t_coord_val **coords_stack);
-static void	draw_line(t_point f, t_point s, t_fdf *fdf);
-t_point		project(t_point p, t_fdf *fdf);
-t_point	new_point(int x, int y, t_map *map);
-
-
-int		ft_close(void *param);
-int		key_press(int key);
-void	setup_controls(t_fdf *fdf);
-
-void	draw(t_map *map, t_fdf *fdf);
-int		draw_line_bresenham(t_fdf *fdf, int beginX, int beginY, int endX, int endY, int color);
-void	swap(int* a, int*b);
-float	absolute(float x);
-int		nb_to_int(float x);
-float	nb_to_frac(float x);
-float	nb_to_r_frac(float x);
-int		add_alpha(int color, float transparency);
-int		draw_line_xiaolin(t_fdf *fdf, int beginX, int beginY, int endX, int endY, int color);
-
-void	img_pix_put(t_fdf *fdf, int x, int y, int color);
+// utils.c
+int	ft_word_count(char *s, char c);
 
 
 #endif
